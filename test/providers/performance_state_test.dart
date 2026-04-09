@@ -32,7 +32,6 @@ void main() {
     });
 
     test('hasPrevious is false at index 0', () {
-      final setlist = Setlist(name: 'Test', songIds: ['a', 'b']);
       const state = PerformanceState(currentSongIndex: 0);
       expect(state.hasPrevious, isFalse);
     });

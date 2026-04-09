@@ -132,9 +132,13 @@ class PerformanceState {
   }
 
   String? get currentSongId {
-    if (activeSetlist == null) return null;
+    if (activeSetlist == null) {
+      return null;
+    }
     if (currentSongIndex < 0 ||
-        currentSongIndex >= activeSetlist!.songIds.length) return null;
+        currentSongIndex >= activeSetlist!.songIds.length) {
+      return null;
+    }
     return activeSetlist!.songIds[currentSongIndex];
   }
 

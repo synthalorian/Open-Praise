@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/app_providers.dart';
 import '../../providers/sync_provider.dart';
 import '../theme.dart';
 import '../song_library/song_library_screen.dart';

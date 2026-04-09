@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/hive_store.dart';
-import '../../features/chord_engine/models.dart';
 import '../../features/chord_engine/transposer.dart';
 import '../../providers/app_providers.dart';
 import '../../providers/sync_provider.dart';

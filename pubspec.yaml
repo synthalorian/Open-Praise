@@ -18,6 +18,7 @@ dependencies:
   network_info_plus: ^5.0.1
   flutter_midi_command: ^0.5.1
   file_picker: ^8.0.0
+  supabase_flutter: ^2.12.2
 
 dev_dependencies:
   flutter_test:

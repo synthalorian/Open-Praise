@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config/supabase_config.dart';
 import 'data/hive_store.dart';
 import 'ui/home/home_screen.dart';
 import 'ui/theme.dart';
@@ -7,6 +9,14 @@ import 'ui/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveStore.init();
+
+  if (SupabaseConfig.isConfigured) {
+    await Supabase.initialize(
+      url: SupabaseConfig.url,
+      anonKey: SupabaseConfig.anonKey,
+    );
+  }
+
   runApp(const ProviderScope(child: OpenPraiseApp()));
 }
 

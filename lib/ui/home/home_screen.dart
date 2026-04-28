@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/sync_provider.dart';
 import '../theme.dart';
+import '../settings/settings_screen.dart';
 import '../song_library/song_library_screen.dart';
 import '../setlist/setlist_list_screen.dart';
 import '../sync/sync_screen.dart';
@@ -12,42 +13,48 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final syncState = ref.watch(syncProvider);
+    final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: NeonTheme.bg,
-      appBar: NeonTheme.appBar('OPEN PRAISE // S6.5'),
+      backgroundColor: theme.bg,
+      appBar: theme.appBar('OPEN PRAISE // S6.5', actions: [
+        IconButton(
+          icon: Icon(Icons.settings, color: theme.primary),
+          tooltip: 'Settings',
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+          ),
+        ),
+      ]),
       body: Stack(
         children: [
-          // Background grid
-          Positioned.fill(child: CustomPaint(painter: _GridPainter())),
-
+          Positioned.fill(child: CustomPaint(painter: _GridPainter(theme))),
           Center(
             child: Padding(
               padding: const EdgeInsets.all(32),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo
-                  const Icon(Icons.music_note_rounded,
-                      size: 80, color: NeonTheme.neonGreen),
+                  Icon(Icons.music_note_rounded, size: 80, color: theme.primary),
                   const SizedBox(height: 8),
                   Text('OPEN PRAISE',
-                      style: NeonTheme.heading.copyWith(
+                      style: theme.heading.copyWith(
                         fontSize: 28,
                         shadows: [
-                          const Shadow(
-                              color: NeonTheme.neonGreen, blurRadius: 12),
+                          Shadow(
+                              color: theme.primary
+                                  .withValues(alpha: theme.glowStrength),
+                              blurRadius: 12),
                         ],
                       )),
                   const SizedBox(height: 4),
-                  const Text('S6.5 // STAGE READY',
+                  Text('S6.5 // STAGE READY',
                       style: TextStyle(
-                          color: NeonTheme.muted,
+                          color: theme.muted,
                           letterSpacing: 3,
                           fontSize: 12)),
                   const SizedBox(height: 48),
-
-                  // Main actions
                   _MenuButton(
                     icon: Icons.library_music,
                     label: 'SONG LIBRARY',
@@ -72,8 +79,8 @@ class HomeScreen extends ConsumerWidget {
                         ? 'SYNC // ${syncState.role.name.toUpperCase()}'
                         : 'SYNC BRIDGE',
                     color: syncState.isConnected
-                        ? NeonTheme.neonCyan
-                        : NeonTheme.neonGreen,
+                        ? theme.tertiary
+                        : theme.primary,
                     onTap: () => Navigator.push(context,
                         MaterialPageRoute(builder: (_) => const SyncScreen())),
                   ),
@@ -91,39 +98,44 @@ class _MenuButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  final Color color;
+  final Color? color;
 
   const _MenuButton({
     required this.icon,
     required this.label,
     required this.onTap,
-    this.color = NeonTheme.neonGreen,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final c = color ?? theme.primary;
     return SizedBox(
       width: 300,
       child: OutlinedButton.icon(
         onPressed: onTap,
-        icon: Icon(icon, color: color),
+        icon: Icon(icon, color: c),
         label: Text(label,
             style: TextStyle(
-                color: color,
+                color: c,
                 letterSpacing: 2,
-                fontFamily: 'monospace',
+                fontFamily: theme.monoFont,
                 fontWeight: FontWeight.bold)),
-        style: NeonTheme.neonButton(color),
+        style: theme.neonButton(c),
       ),
     );
   }
 }
 
 class _GridPainter extends CustomPainter {
+  final AppTheme theme;
+  _GridPainter(this.theme);
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = NeonTheme.neonGreen.withValues(alpha:0.04)
+      ..color = theme.primary.withValues(alpha: 0.04 * theme.glowStrength)
       ..strokeWidth = 1.0;
 
     const spacing = 40.0;
@@ -136,5 +148,6 @@ class _GridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _GridPainter oldDelegate) =>
+      oldDelegate.theme.id != theme.id;
 }

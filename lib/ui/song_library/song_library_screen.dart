@@ -3,9 +3,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/chord_engine/models.dart';
+import '../../features/pdf_import/pdf_chord_extractor.dart';
 import '../../providers/app_providers.dart';
 import '../theme.dart';
 import '../chord_sheet_view.dart';
+import '../pdf_import/pdf_import_preview_screen.dart';
 
 class SongLibraryScreen extends ConsumerWidget {
   const SongLibraryScreen({super.key});
@@ -13,17 +15,23 @@ class SongLibraryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final songs = ref.watch(songLibraryProvider);
+    final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: NeonTheme.bg,
-      appBar: NeonTheme.appBar('SONG LIBRARY', actions: [
+      backgroundColor: theme.bg,
+      appBar: theme.appBar('SONG LIBRARY', actions: [
         IconButton(
-          icon: const Icon(Icons.file_open, color: NeonTheme.neonCyan),
-          tooltip: 'Import from file',
+          icon: Icon(Icons.picture_as_pdf, color: theme.secondary),
+          tooltip: 'Import PDF',
+          onPressed: () => _importFromPdf(context, ref),
+        ),
+        IconButton(
+          icon: Icon(Icons.file_open, color: theme.tertiary),
+          tooltip: 'Import ChordPro file',
           onPressed: () => _importFromFile(context, ref),
         ),
         IconButton(
-          icon: const Icon(Icons.add, color: NeonTheme.neonPink),
+          icon: Icon(Icons.add, color: theme.secondary),
           tooltip: 'Paste ChordPro',
           onPressed: () => _showImportDialog(context, ref),
         ),
@@ -33,11 +41,11 @@ class SongLibraryScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.music_off, size: 64, color: NeonTheme.muted),
+                  Icon(Icons.music_off, size: 64, color: theme.muted),
                   const SizedBox(height: 16),
-                  const Text('NO SONGS IN LIBRARY',
+                  Text('NO SONGS IN LIBRARY',
                       style: TextStyle(
-                          color: NeonTheme.muted,
+                          color: theme.muted,
                           letterSpacing: 2,
                           fontSize: 14)),
                   const SizedBox(height: 24),
@@ -45,7 +53,7 @@ class SongLibraryScreen extends ConsumerWidget {
                     onPressed: () => _showImportDialog(context, ref),
                     icon: const Icon(Icons.add),
                     label: const Text('IMPORT CHORDPRO'),
-                    style: NeonTheme.neonButton(NeonTheme.neonPink),
+                    style: theme.neonButton(theme.secondary),
                   ),
                 ],
               ),
@@ -84,20 +92,80 @@ class SongLibraryScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Imported $imported song${imported == 1 ? "" : "s"}'),
-          backgroundColor: NeonTheme.surface,
+          backgroundColor: AppTheme.of(context).surface,
         ),
       );
     }
   }
 
+  Future<void> _importFromPdf(BuildContext context, WidgetRef ref) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (result == null || result.files.isEmpty) return;
+    final path = result.files.first.path;
+    if (path == null) return;
+
+    // Kick extraction with a loading dialog.
+    if (!context.mounted) return;
+    final theme = AppTheme.of(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: theme.surface,
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: theme.primary),
+            const SizedBox(width: 16),
+            Text('EXTRACTING…',
+                style: theme.heading.copyWith(fontSize: 14)),
+          ],
+        ),
+      ),
+    );
+
+    PdfExtractionResult extraction;
+    try {
+      extraction = await PdfChordExtractor.extract(File(path));
+    } catch (e) {
+      if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PDF import failed: $e'),
+            backgroundColor: theme.surface,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+    if (!context.mounted) return;
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PdfImportPreviewScreen(
+          sourcePath: path,
+          extraction: extraction,
+        ),
+      ),
+    );
+  }
+
   void _showImportDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
+    final theme = AppTheme.of(context);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: NeonTheme.surface,
-        title: Text('IMPORT CHORDPRO', style: NeonTheme.heading.copyWith(fontSize: 16)),
+        backgroundColor: theme.surface,
+        title: Text('IMPORT CHORDPRO',
+            style: theme.heading.copyWith(fontSize: 16)),
         content: SizedBox(
           width: 500,
           height: 300,
@@ -105,18 +173,21 @@ class SongLibraryScreen extends ConsumerWidget {
             controller: controller,
             maxLines: null,
             expands: true,
-            style: NeonTheme.mono.copyWith(fontSize: 13),
+            style: theme.mono.copyWith(fontSize: 13),
             decoration: InputDecoration(
-              hintText: 'Paste ChordPro content here...\n\n{title: Amazing Grace}\n{key: G}\n[G]Amazing [C]grace...',
-              hintStyle: const TextStyle(color: NeonTheme.muted, fontSize: 12),
+              hintText:
+                  'Paste ChordPro content here...\n\n{title: Amazing Grace}\n{key: G}\n[G]Amazing [C]grace...',
+              hintStyle: TextStyle(color: theme.muted, fontSize: 12),
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: NeonTheme.neonGreen.withValues(alpha:0.3)),
+                borderSide:
+                    BorderSide(color: theme.primary.withValues(alpha: 0.3)),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: NeonTheme.neonGreen.withValues(alpha:0.3)),
+                borderSide:
+                    BorderSide(color: theme.primary.withValues(alpha: 0.3)),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: NeonTheme.neonGreen),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: theme.primary),
               ),
             ),
           ),
@@ -124,7 +195,7 @@ class SongLibraryScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL', style: TextStyle(color: NeonTheme.muted)),
+            child: Text('CANCEL', style: TextStyle(color: theme.muted)),
           ),
           OutlinedButton(
             onPressed: () {
@@ -135,7 +206,7 @@ class SongLibraryScreen extends ConsumerWidget {
                 Navigator.pop(ctx);
               }
             },
-            style: NeonTheme.neonButton(NeonTheme.neonPink),
+            style: theme.neonButton(theme.secondary),
             child: const Text('IMPORT'),
           ),
         ],
@@ -151,13 +222,14 @@ class _SongTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: NeonTheme.neonBorder(),
+      decoration: theme.neonBorder(),
       child: ListTile(
-        leading: const Icon(Icons.music_note, color: NeonTheme.neonGreen),
+        leading: Icon(Icons.music_note, color: theme.primary),
         title: Text(song.title,
-            style: NeonTheme.mono.copyWith(fontWeight: FontWeight.bold)),
+            style: theme.mono.copyWith(fontWeight: FontWeight.bold)),
         subtitle: Text(
           [
             if (song.artist != null) song.artist!,
@@ -165,7 +237,7 @@ class _SongTile extends ConsumerWidget {
             if (song.capo != null) 'Capo: ${song.capo}',
             if (song.tempo != null) '${song.tempo} BPM',
           ].join(' · '),
-          style: const TextStyle(color: NeonTheme.muted, fontSize: 12),
+          style: TextStyle(color: theme.muted, fontSize: 12),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
@@ -193,12 +265,13 @@ class _SongPreviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
     return Scaffold(
-      backgroundColor: NeonTheme.bg,
-      appBar: NeonTheme.appBar(song.title.toUpperCase(), actions: [
+      backgroundColor: theme.bg,
+      appBar: theme.appBar(song.title.toUpperCase(), actions: [
         if (song.rawContent != null)
           IconButton(
-            icon: const Icon(Icons.edit, color: NeonTheme.neonCyan),
+            icon: Icon(Icons.edit, color: theme.tertiary),
             tooltip: 'Edit ChordPro',
             onPressed: () => _showEditDialog(context, ref),
           ),
@@ -209,12 +282,14 @@ class _SongPreviewScreen extends ConsumerWidget {
 
   void _showEditDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController(text: song.rawContent ?? '');
+    final theme = AppTheme.of(context);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: NeonTheme.surface,
-        title: Text('EDIT CHORDPRO', style: NeonTheme.heading.copyWith(fontSize: 16)),
+        backgroundColor: theme.surface,
+        title:
+            Text('EDIT CHORDPRO', style: theme.heading.copyWith(fontSize: 16)),
         content: SizedBox(
           width: 500,
           height: 400,
@@ -222,16 +297,18 @@ class _SongPreviewScreen extends ConsumerWidget {
             controller: controller,
             maxLines: null,
             expands: true,
-            style: NeonTheme.mono.copyWith(fontSize: 13),
+            style: theme.mono.copyWith(fontSize: 13),
             decoration: InputDecoration(
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: NeonTheme.neonGreen.withValues(alpha:0.3)),
+                borderSide:
+                    BorderSide(color: theme.primary.withValues(alpha: 0.3)),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: NeonTheme.neonGreen.withValues(alpha:0.3)),
+                borderSide:
+                    BorderSide(color: theme.primary.withValues(alpha: 0.3)),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: NeonTheme.neonGreen),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: theme.primary),
               ),
             ),
           ),
@@ -239,7 +316,7 @@ class _SongPreviewScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL', style: TextStyle(color: NeonTheme.muted)),
+            child: Text('CANCEL', style: TextStyle(color: theme.muted)),
           ),
           OutlinedButton(
             onPressed: () {
@@ -251,7 +328,7 @@ class _SongPreviewScreen extends ConsumerWidget {
                 Navigator.pop(context);
               }
             },
-            style: NeonTheme.neonButton(NeonTheme.neonCyan),
+            style: theme.neonButton(theme.tertiary),
             child: const Text('SAVE'),
           ),
         ],

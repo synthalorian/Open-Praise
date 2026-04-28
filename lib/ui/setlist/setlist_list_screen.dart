@@ -11,12 +11,13 @@ class SetlistListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final setlists = ref.watch(setlistProvider);
+    final theme = AppTheme.of(context);
 
     return Scaffold(
-      backgroundColor: NeonTheme.bg,
-      appBar: NeonTheme.appBar('SETLISTS', actions: [
+      backgroundColor: theme.bg,
+      appBar: theme.appBar('SETLISTS', actions: [
         IconButton(
-          icon: const Icon(Icons.add, color: NeonTheme.neonPink),
+          icon: Icon(Icons.add, color: theme.secondary),
           tooltip: 'New Setlist',
           onPressed: () => _showCreateDialog(context, ref),
         ),
@@ -26,11 +27,11 @@ class SetlistListScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.queue_music, size: 64, color: NeonTheme.muted),
+                  Icon(Icons.queue_music, size: 64, color: theme.muted),
                   const SizedBox(height: 16),
-                  const Text('NO SETLISTS YET',
+                  Text('NO SETLISTS YET',
                       style: TextStyle(
-                          color: NeonTheme.muted,
+                          color: theme.muted,
                           letterSpacing: 2,
                           fontSize: 14)),
                   const SizedBox(height: 24),
@@ -38,7 +39,7 @@ class SetlistListScreen extends ConsumerWidget {
                     onPressed: () => _showCreateDialog(context, ref),
                     icon: const Icon(Icons.add),
                     label: const Text('CREATE SETLIST'),
-                    style: NeonTheme.neonButton(NeonTheme.neonPink),
+                    style: theme.neonButton(theme.secondary),
                   ),
                 ],
               ),
@@ -56,40 +57,45 @@ class SetlistListScreen extends ConsumerWidget {
 
   void _showCreateDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
+    final theme = AppTheme.of(context);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: NeonTheme.surface,
-        title: Text('NEW SETLIST', style: NeonTheme.heading.copyWith(fontSize: 16)),
+        backgroundColor: theme.surface,
+        title:
+            Text('NEW SETLIST', style: theme.heading.copyWith(fontSize: 16)),
         content: TextField(
           controller: controller,
           autofocus: true,
-          style: NeonTheme.mono,
+          style: theme.mono,
           decoration: InputDecoration(
             hintText: 'Setlist name...',
-            hintStyle: const TextStyle(color: NeonTheme.muted),
+            hintStyle: TextStyle(color: theme.muted),
             enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: NeonTheme.neonGreen.withValues(alpha:0.3)),
+              borderSide:
+                  BorderSide(color: theme.primary.withValues(alpha: 0.3)),
             ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: NeonTheme.neonGreen),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: theme.primary),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL', style: TextStyle(color: NeonTheme.muted)),
+            child: Text('CANCEL', style: TextStyle(color: theme.muted)),
           ),
           OutlinedButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
-                ref.read(setlistProvider.notifier).createSetlist(controller.text.trim());
+                ref
+                    .read(setlistProvider.notifier)
+                    .createSetlist(controller.text.trim());
                 Navigator.pop(ctx);
               }
             },
-            style: NeonTheme.neonButton(NeonTheme.neonPink),
+            style: theme.neonButton(theme.secondary),
             child: const Text('CREATE'),
           ),
         ],
@@ -105,17 +111,18 @@ class _SetlistTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: NeonTheme.neonBorder(NeonTheme.neonPink),
+      decoration: theme.neonBorder(theme.secondary),
       child: ListTile(
-        leading: const Icon(Icons.queue_music, color: NeonTheme.neonPink),
+        leading: Icon(Icons.queue_music, color: theme.secondary),
         title: Text(setlist.name,
-            style: NeonTheme.mono.copyWith(
-                fontWeight: FontWeight.bold, color: NeonTheme.neonPink)),
+            style: theme.mono.copyWith(
+                fontWeight: FontWeight.bold, color: theme.secondary)),
         subtitle: Text(
           '${setlist.songIds.length} song${setlist.songIds.length == 1 ? "" : "s"}',
-          style: const TextStyle(color: NeonTheme.muted, fontSize: 12),
+          style: TextStyle(color: theme.muted, fontSize: 12),
         ),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline, color: Colors.redAccent),

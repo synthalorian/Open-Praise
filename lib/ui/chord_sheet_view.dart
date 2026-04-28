@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../features/chord_engine/models.dart';
+import 'theme.dart';
 
 class ChordSheetView extends ConsumerWidget {
   final Song song;
@@ -30,29 +31,29 @@ class _SectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section Header (Neon Pink for visibility)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.pinkAccent),
+              border: Border.all(color: theme.sectionHeaderBorder),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               section.title.toUpperCase(),
-              style: const TextStyle(
-                color: Colors.pinkAccent,
+              style: TextStyle(
+                color: theme.sectionHeader,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
+                fontFamily: theme.monoFont,
               ),
             ),
           ),
           const SizedBox(height: 12),
-          // Section Content
           ...section.lines.map((line) => _LineWidget(line: line)),
         ],
       ),
@@ -67,7 +68,7 @@ class _LineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Basic regex to identify chords in [brackets]
+    final theme = AppTheme.of(context);
     final parts = line.split(RegExp(r'(?=\[)|(?<=\])'));
 
     return Padding(
@@ -84,24 +85,25 @@ class _LineWidget extends StatelessWidget {
                 children: [
                   Text(
                     chord,
-                    style: const TextStyle(
-                      color: Colors.greenAccent, // Neon Green Chords
+                    style: TextStyle(
+                      color: theme.chord,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      fontFamily: 'monospace',
+                      fontFamily: theme.monoFont,
                     ),
                   ),
-                  const SizedBox(height: 16), // Spacer for text below
+                  const SizedBox(height: 16),
                 ],
               ),
             );
           } else {
             return Text(
               part,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.text,
                 fontSize: 18,
                 height: 1.5,
+                fontFamily: theme.bodyFont,
               ),
             );
           }

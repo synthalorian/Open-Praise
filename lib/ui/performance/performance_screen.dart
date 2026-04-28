@@ -62,7 +62,6 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
         perf.resetTranspose();
         break;
       case LogicalKeyboardKey.keyS:
-        // Show setlist overview
         _showSetlistDrawer();
         break;
       default:
@@ -72,21 +71,23 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
 
   void _showTransposeOverlay() {
     final perf = ref.read(performanceProvider);
+    final theme = AppTheme.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: NeonTheme.surface,
-        title: Text('TRANSPOSE', style: NeonTheme.heading.copyWith(fontSize: 16)),
+        backgroundColor: theme.surface,
+        title:
+            Text('TRANSPOSE', style: theme.heading.copyWith(fontSize: 16)),
         content: Text(
           'Current offset: ${perf.transposeOffset > 0 ? "+${perf.transposeOffset}" : "${perf.transposeOffset}"}\n\n'
           '↑ / ↓  to transpose\n'
           '0  to reset',
-          style: NeonTheme.mono,
+          style: theme.mono,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CLOSE', style: TextStyle(color: NeonTheme.muted)),
+            child: Text('CLOSE', style: TextStyle(color: theme.muted)),
           ),
         ],
       ),
@@ -97,10 +98,11 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
     final perf = ref.read(performanceProvider);
     final setlist = perf.activeSetlist;
     if (setlist == null) return;
+    final theme = AppTheme.of(context);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: NeonTheme.surface,
+      backgroundColor: theme.surface,
       builder: (ctx) => ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: setlist.songIds.length,
@@ -109,23 +111,25 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
           final song = HiveStore.getSong(songId);
           final songTitle = song?.title ?? songId;
           final isActive = index == perf.currentSongIndex;
+          final activeColor = theme.tertiary;
 
           return ListTile(
             leading: Text(
               '${index + 1}',
-              style: NeonTheme.heading.copyWith(
+              style: theme.heading.copyWith(
                 fontSize: 18,
-                color: isActive ? NeonTheme.neonCyan : NeonTheme.neonGreen,
+                color: isActive ? activeColor : theme.primary,
               ),
             ),
             title: Text(
               songTitle,
-              style: NeonTheme.mono.copyWith(
-                color: isActive ? NeonTheme.neonCyan : NeonTheme.text,
+              style: theme.mono.copyWith(
+                color: isActive ? activeColor : theme.text,
                 fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-            tileColor: isActive ? NeonTheme.neonCyan.withValues(alpha:0.1) : null,
+            tileColor:
+                isActive ? activeColor.withValues(alpha: 0.1) : null,
             onTap: () {
               ref.read(performanceProvider.notifier).goToSong(index);
               Navigator.pop(ctx);
@@ -141,8 +145,8 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
     final perf = ref.watch(performanceProvider);
     final syncState = ref.watch(syncProvider);
     final song = perf.currentSong;
+    final theme = AppTheme.of(context);
 
-    // Apply transposition
     final displaySong = song != null && perf.transposeOffset != 0
         ? ChordTransposer.transposeSong(song, perf.transposeOffset)
         : song;
@@ -151,38 +155,38 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
       focusNode: _focusNode,
       onKeyEvent: _handleKey,
       child: Scaffold(
-        backgroundColor: NeonTheme.bg,
+        backgroundColor: theme.bg,
         appBar: AppBar(
-          backgroundColor: NeonTheme.bg,
+          backgroundColor: theme.bg,
           elevation: 0,
-          iconTheme: const IconThemeData(color: NeonTheme.neonGreen),
+          iconTheme: IconThemeData(color: theme.primary),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 displaySong?.title.toUpperCase() ?? 'NO SONG',
-                style: NeonTheme.heading.copyWith(fontSize: 14),
+                style: theme.heading.copyWith(fontSize: 14),
               ),
               Row(
                 children: [
                   if (displaySong?.key != null)
                     Text('KEY: ${displaySong!.key}  ',
-                        style: const TextStyle(
-                            color: NeonTheme.neonPink, fontSize: 11)),
+                        style: TextStyle(
+                            color: theme.secondary, fontSize: 11)),
                   if (perf.transposeOffset != 0)
                     Text(
                       'T:${perf.transposeOffset > 0 ? "+${perf.transposeOffset}" : "${perf.transposeOffset}"}  ',
-                      style: const TextStyle(
-                          color: NeonTheme.neonCyan, fontSize: 11),
+                      style: TextStyle(
+                          color: theme.tertiary, fontSize: 11),
                     ),
                   Text(
                     '${perf.currentSongIndex + 1}/${perf.songCount}',
-                    style: const TextStyle(color: NeonTheme.muted, fontSize: 11),
+                    style: TextStyle(color: theme.muted, fontSize: 11),
                   ),
                   if (syncState.isConnected) ...[
                     const SizedBox(width: 8),
                     Icon(Icons.wifi_tethering,
-                        size: 12, color: NeonTheme.neonCyan),
+                        size: 12, color: theme.tertiary),
                   ],
                 ],
               ),
@@ -193,10 +197,11 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
             child: Container(
               height: 2,
               decoration: BoxDecoration(
-                color: NeonTheme.neonGreen,
+                color: theme.primary,
                 boxShadow: [
                   BoxShadow(
-                      color: NeonTheme.neonGreen,
+                      color: theme.primary
+                          .withValues(alpha: theme.glowStrength),
                       blurRadius: 4,
                       spreadRadius: 1),
                 ],
@@ -205,21 +210,21 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
           ),
         ),
         body: displaySong == null
-            ? const Center(
+            ? Center(
                 child: Text('NO SONG LOADED',
-                    style: TextStyle(color: NeonTheme.muted, letterSpacing: 2)),
+                    style:
+                        TextStyle(color: theme.muted, letterSpacing: 2)),
               )
             : ChordSheetView(song: displaySong),
         bottomNavigationBar: Container(
-          color: NeonTheme.bg,
+          color: theme.bg,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Previous
               IconButton(
                 icon: const Icon(Icons.skip_previous, size: 32),
-                color: perf.hasPrevious ? NeonTheme.neonGreen : NeonTheme.muted,
+                color: perf.hasPrevious ? theme.primary : theme.muted,
                 onPressed: perf.hasPrevious
                     ? () {
                         ref.read(performanceProvider.notifier).previousSong();
@@ -229,43 +234,39 @@ class _PerformanceScreenState extends ConsumerState<PerformanceScreen> {
                       }
                     : null,
               ),
-              // Transpose down
               IconButton(
                 icon: const Icon(Icons.remove),
-                color: NeonTheme.neonPink,
+                color: theme.secondary,
                 onPressed: () {
                   ref.read(performanceProvider.notifier).transposeDown();
                 },
               ),
-              // Transpose display
               GestureDetector(
                 onTap: () =>
                     ref.read(performanceProvider.notifier).resetTranspose(),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: NeonTheme.neonBorder(NeonTheme.neonCyan),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  decoration: theme.neonBorder(theme.tertiary),
                   child: Text(
                     perf.transposeOffset == 0
                         ? 'ORIG'
                         : '${perf.transposeOffset > 0 ? "+" : ""}${perf.transposeOffset}',
-                    style: NeonTheme.mono
-                        .copyWith(color: NeonTheme.neonCyan, fontSize: 16),
+                    style: theme.mono
+                        .copyWith(color: theme.tertiary, fontSize: 16),
                   ),
                 ),
               ),
-              // Transpose up
               IconButton(
                 icon: const Icon(Icons.add),
-                color: NeonTheme.neonPink,
+                color: theme.secondary,
                 onPressed: () {
                   ref.read(performanceProvider.notifier).transposeUp();
                 },
               ),
-              // Next
               IconButton(
                 icon: const Icon(Icons.skip_next, size: 32),
-                color: perf.hasNext ? NeonTheme.neonGreen : NeonTheme.muted,
+                color: perf.hasNext ? theme.primary : theme.muted,
                 onPressed: perf.hasNext
                     ? () {
                         ref.read(performanceProvider.notifier).nextSong();

@@ -13,17 +13,17 @@ class SetlistDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Re-read setlists so we react to changes
     final setlists = ref.watch(setlistProvider);
     final setlist = setlists.where((s) => s.id == setlistId).firstOrNull;
+    final theme = AppTheme.of(context);
 
     if (setlist == null) {
       return Scaffold(
-        backgroundColor: NeonTheme.bg,
-        appBar: NeonTheme.appBar('SETLIST NOT FOUND'),
-        body: const Center(
+        backgroundColor: theme.bg,
+        appBar: theme.appBar('SETLIST NOT FOUND'),
+        body: Center(
           child: Text('This setlist has been deleted.',
-              style: TextStyle(color: NeonTheme.muted)),
+              style: TextStyle(color: theme.muted)),
         ),
       );
     }
@@ -35,15 +35,15 @@ class SetlistDetailScreen extends ConsumerWidget {
         .toList();
 
     return Scaffold(
-      backgroundColor: NeonTheme.bg,
-      appBar: NeonTheme.appBar(setlist.name.toUpperCase(), actions: [
+      backgroundColor: theme.bg,
+      appBar: theme.appBar(setlist.name.toUpperCase(), actions: [
         IconButton(
-          icon: const Icon(Icons.add, color: NeonTheme.neonPink),
+          icon: Icon(Icons.add, color: theme.secondary),
           tooltip: 'Add Song',
           onPressed: () => _showAddSongDialog(context, ref, setlist),
         ),
         IconButton(
-          icon: const Icon(Icons.play_arrow, color: NeonTheme.neonCyan),
+          icon: Icon(Icons.play_arrow, color: theme.tertiary),
           tooltip: 'Perform',
           onPressed: songs.isEmpty
               ? null
@@ -62,16 +62,17 @@ class SetlistDetailScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.playlist_add, size: 64, color: NeonTheme.muted),
+                  Icon(Icons.playlist_add, size: 64, color: theme.muted),
                   const SizedBox(height: 16),
-                  const Text('EMPTY SETLIST',
-                      style: TextStyle(color: NeonTheme.muted, letterSpacing: 2)),
+                  Text('EMPTY SETLIST',
+                      style:
+                          TextStyle(color: theme.muted, letterSpacing: 2)),
                   const SizedBox(height: 24),
                   OutlinedButton.icon(
                     onPressed: () => _showAddSongDialog(context, ref, setlist),
                     icon: const Icon(Icons.add),
                     label: const Text('ADD SONGS'),
-                    style: NeonTheme.neonButton(NeonTheme.neonPink),
+                    style: theme.neonButton(theme.secondary),
                   ),
                 ],
               ),
@@ -89,22 +90,21 @@ class SetlistDetailScreen extends ConsumerWidget {
                 return Container(
                   key: ValueKey('${song.id}_$index'),
                   margin: const EdgeInsets.only(bottom: 8),
-                  decoration: NeonTheme.neonBorder(),
+                  decoration: theme.neonBorder(),
                   child: ListTile(
                     leading: Text(
                       '${index + 1}',
-                      style: NeonTheme.heading.copyWith(fontSize: 20),
+                      style: theme.heading.copyWith(fontSize: 20),
                     ),
                     title: Text(song.title,
-                        style: NeonTheme.mono
+                        style: theme.mono
                             .copyWith(fontWeight: FontWeight.bold)),
                     subtitle: Text(
                       [
                         if (song.artist != null) song.artist!,
                         if (song.key != null) 'Key: ${song.key}',
                       ].join(' · '),
-                      style:
-                          const TextStyle(color: NeonTheme.muted, fontSize: 12),
+                      style: TextStyle(color: theme.muted, fontSize: 12),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.remove_circle_outline,
@@ -126,22 +126,23 @@ class SetlistDetailScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, Setlist setlist) {
     final allSongs = ref.read(songLibraryProvider);
     final existingIds = setlist.songIds.toSet();
+    final theme = AppTheme.of(context);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: NeonTheme.surface,
+      backgroundColor: theme.surface,
       builder: (ctx) {
         final available =
             allSongs.where((s) => !existingIds.contains(s.id)).toList();
 
         if (available.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
+          return Padding(
+            padding: const EdgeInsets.all(32),
             child: Center(
               child: Text(
                 'No more songs to add.\nImport songs in the Song Library first.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: NeonTheme.muted),
+                style: TextStyle(color: theme.muted),
               ),
             ),
           );
@@ -154,10 +155,10 @@ class SetlistDetailScreen extends ConsumerWidget {
             final song = available[index];
             return ListTile(
               leading:
-                  const Icon(Icons.add_circle_outline, color: NeonTheme.neonGreen),
-              title: Text(song.title, style: NeonTheme.mono),
+                  Icon(Icons.add_circle_outline, color: theme.primary),
+              title: Text(song.title, style: theme.mono),
               subtitle: Text(song.artist ?? '',
-                  style: const TextStyle(color: NeonTheme.muted, fontSize: 12)),
+                  style: TextStyle(color: theme.muted, fontSize: 12)),
               onTap: () {
                 ref
                     .read(setlistProvider.notifier)

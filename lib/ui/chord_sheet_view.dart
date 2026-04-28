@@ -68,46 +68,84 @@ class _LineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AppTheme.of(context);
-    final parts = line.split(RegExp(r'(?=\[)|(?<=\])'));
+    final pairs = _parseChordPairs(line);
+    if (pairs.isEmpty) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.end,
-        children: parts.map((part) {
-          if (part.startsWith('[') && part.endsWith(']')) {
-            final chord = part.substring(1, part.length - 1);
-            return Padding(
-              padding: const EdgeInsets.only(right: 4.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    chord,
+        crossAxisAlignment: WrapCrossAlignment.start,
+        children: pairs
+            .map((p) => _ChordLyricPair(chord: p.chord, word: p.word))
+            .toList(),
+      ),
+    );
+  }
+
+  /// Splits a ChordPro-inline line into per-word (chord?, word) pairs.
+  /// `[G]Amazing [D]grace` → [(G, "Amazing"), (null, "grace")]
+  /// Chord-only segments (instrumental) become (chord, "").
+  /// A chord attaches to the first word of the segment that follows it; later
+  /// words in the same segment carry no chord.
+  static List<({String? chord, String word})> _parseChordPairs(String line) {
+    final out = <({String? chord, String word})>[];
+    final segment = RegExp(r'\[([^\]]+)\]([^\[]*)|([^\[]+)');
+    for (final m in segment.allMatches(line)) {
+      final chord = m.group(1);
+      final lyric = (m.group(2) ?? m.group(3) ?? '');
+      final words = lyric.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+      if (words.isEmpty) {
+        if (chord != null) out.add((chord: chord, word: ''));
+        continue;
+      }
+      for (var i = 0; i < words.length; i++) {
+        out.add((chord: i == 0 ? chord : null, word: words[i]));
+      }
+    }
+    return out;
+  }
+}
+
+class _ChordLyricPair extends StatelessWidget {
+  final String? chord;
+  final String word;
+
+  const _ChordLyricPair({required this.chord, required this.word});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 22,
+            child: chord == null
+                ? null
+                : Text(
+                    chord!,
                     style: TextStyle(
                       color: theme.chord,
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 16,
                       fontFamily: theme.monoFont,
+                      height: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            );
-          } else {
-            return Text(
-              part,
-              style: TextStyle(
-                color: theme.text,
-                fontSize: 18,
-                height: 1.5,
-                fontFamily: theme.bodyFont,
-              ),
-            );
-          }
-        }).toList(),
+          ),
+          Text(
+            word,
+            style: TextStyle(
+              color: theme.text,
+              fontSize: 18,
+              height: 1.2,
+              fontFamily: theme.bodyFont,
+            ),
+          ),
+        ],
       ),
     );
   }

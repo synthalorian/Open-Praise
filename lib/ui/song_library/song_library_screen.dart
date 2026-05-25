@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -146,14 +147,14 @@ class SongLibraryScreen extends ConsumerWidget {
     if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
     if (!context.mounted) return;
 
-    await Navigator.of(context).push(
+    unawaited(Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PdfImportPreviewScreen(
           sourcePath: path,
           extraction: extraction,
         ),
       ),
-    );
+    ));
   }
 
   void _showImportDialog(BuildContext context, WidgetRef ref) {

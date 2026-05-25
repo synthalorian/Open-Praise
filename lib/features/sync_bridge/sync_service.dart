@@ -35,7 +35,7 @@ class SyncServer extends ChangeNotifier {
   /// Broadcast a message to all connected followers
   void broadcast(Map<String, dynamic> data) {
     final message = jsonEncode(data);
-    for (var client in _clients) {
+    for (final client in _clients) {
       client.add(message);
     }
   }
@@ -47,7 +47,7 @@ class SyncServer extends ChangeNotifier {
 
   void stop() {
     _server?.close();
-    for (var client in _clients) {
+    for (final client in _clients) {
       client.close();
     }
     _clients.clear();

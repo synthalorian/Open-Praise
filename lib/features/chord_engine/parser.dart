@@ -2,8 +2,8 @@ import 'models.dart';
 
 class ChordProParser {
   static Song parse(String content) {
-    final List<String> lines = content.split('\n');
-    String title = 'Untitled Song';
+    final lines = content.split('\n');
+    var title = 'Untitled Song';
     String? artist;
     String? key;
     int? tempo;
@@ -12,7 +12,7 @@ class ChordProParser {
     String currentSectionTitle = 'Verse';
     List<String> currentSectionLines = [];
 
-    for (var line in lines) {
+    for (final line in lines) {
       final trimmed = line.trim();
       if (trimmed.isEmpty) continue;
 

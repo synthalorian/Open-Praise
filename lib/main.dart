@@ -19,15 +19,14 @@ void main() async {
   // Custom error widget for uncaught build errors
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return const Material(
-      color: Color(0xFF0B0420),
+      color: Color(0xFF0D0221),
       child: Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.error_outline,
-                  color: Color(0xFFFF2EC8), size: 64),
+            children: [                  Icon(Icons.error_outline,
+                  color: Color(0xFFFF00FF), size: 64),
               SizedBox(height: 16),
               _ErrorTitle(),
               SizedBox(height: 12),
@@ -74,7 +73,7 @@ class _ErrorTitle extends StatelessWidget {
       'OPEN PRAISE',
       style: TextStyle(
         fontFamily: 'monospace',
-        color: Color(0xFFB26CFF),
+        color: Color(0xFF8F00FF),
         fontWeight: FontWeight.bold,
         letterSpacing: 2.0,
         fontSize: 20,

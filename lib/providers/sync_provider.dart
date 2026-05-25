@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/supabase_config.dart';
 import '../features/sync_bridge/discovery_service.dart';
@@ -105,7 +107,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
   Future<void> startAsFollower() async {
     _discovery.startFollowerDiscovery((ip, name) {
       if (state.role == SyncRole.follower && !state.isConnected) {
-        _connectToLeader(ip, name);
+        unawaited(_connectToLeader(ip, name));
       }
     });
     state = state.copyWith(role: SyncRole.follower, mode: SyncMode.local);

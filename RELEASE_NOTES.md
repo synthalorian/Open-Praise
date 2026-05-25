@@ -4,6 +4,31 @@ _Synthwave worship. Neon chords. Zero lag._
 
 ---
 
+## v1.4.0+1 — "Production Ready" 🛡️
+
+### Error Handling & Resilience 🛡️
+
+- **Global error handlers** — `FlutterError.onError` + `PlatformDispatcher.onError` catch all uncaught exceptions with themed error widgets.
+- **Graceful startup** — Supabase initialization wrapped in try/catch; app works locally even if remote sync config fails.
+- **Custom ErrorWidget** — Synthwave-styled error screen matching the app's aesthetic instead of default red debug banner.
+
+### Linting & Code Quality 🧹
+
+- **Stricter lint rules** — Added `prefer_final_locals`, `prefer_const_constructors`, `prefer_single_quotes`, `unnecessary_lambdas`, `require_trailing_commas`, and more.
+- **Fixed all warnings** — Removed unused variables, added `const` constructors, cleaned up `print` statements across the codebase.
+
+### CI/CD 🚀
+
+- **GitHub Actions CI** — Automated `flutter analyze` + `flutter test` on every push/PR to `main`.
+- **Release pipeline** — Automated APK build and GitHub Release creation.
+
+### Testing 🧪
+
+- **Fixed smoke test** — `sync_bridge_discovery_smoke_test.dart` converted from standalone script to proper `flutter_test` test.
+- ✅ All 76 tests pass with zero analysis warnings.
+
+---
+
 ## v1.1.0+1 — "Midnight Drive" 🌆
 
 ### Chord Engine 🎸

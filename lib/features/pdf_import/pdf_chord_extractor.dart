@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -150,7 +151,7 @@ class PdfChordExtractor {
         if (data == null) {
           throw StateError('PNG encode failed for page ${pageIndex + 1}');
         }
-        await File(outPath).writeAsBytes(data.buffer.asUint8List());
+        unawaited(File(outPath).writeAsBytes(data.buffer.asUint8List()));
       } finally {
         image.dispose();
       }

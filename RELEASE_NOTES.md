@@ -4,6 +4,25 @@ _Synthwave worship. Neon chords. Zero lag._
 
 ---
 
+## v1.5.0+1 — "Theme Plethora" 🎨
+
+### Theme Overhaul 🎨
+
+- **23 themes across 3 categories** — Synthwave (8), Standard (7), Special (9) — a true plethora.
+- **Synthwave '84** — New default theme matching the Omarchy synthwave84 desktop config: deep purple `#0D0221` background, `#8F00FF` purple primary, `#FF00FF` hot pink secondary, `#F3E70F` yellow tertiary.
+- **10 new themes** — Dark Neutral, Nord, Solarized Light, Dracula, Cyberpunk, Aurora, Retro Terminal, Ocean, Royal, Tokyo Night, Monokai.
+- **All 12 existing themes redesigned** — Improved color palettes, better contrast, richer aesthetics.
+- **Category grouping** — Settings screen now groups themes into collapsible sections with accent-colored headers and theme counts.
+- **AppTheme Model** — Added `category` field for classification and grouped display.
+
+### Testing 🧪
+
+- ✅ 79 tests pass (up from 76)
+- ✅ All 23 themes validated for unique identities and valid ThemeData
+- ✅ `flutter analyze` — 0 errors, 0 warnings
+
+---
+
 ## v1.4.0+1 — "Production Ready" 🛡️
 
 ### Error Handling & Resilience 🛡️

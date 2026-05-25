@@ -24,6 +24,9 @@ class AppTheme extends ThemeExtension<AppTheme> {
   final Color sectionHeader;
   final Color sectionHeaderBorder;
 
+  // Classification
+  final String category;
+
   // Typography
   final String bodyFont;
   final String monoFont;
@@ -33,6 +36,7 @@ class AppTheme extends ThemeExtension<AppTheme> {
     required this.id,
     required this.name,
     required this.tagline,
+    required this.category,
     required this.brightness,
     required this.bg,
     required this.surface,
@@ -151,6 +155,7 @@ class AppTheme extends ThemeExtension<AppTheme> {
     String? id,
     String? name,
     String? tagline,
+    String? category,
     Brightness? brightness,
     Color? bg,
     Color? surface,
@@ -170,6 +175,7 @@ class AppTheme extends ThemeExtension<AppTheme> {
         id: id ?? this.id,
         name: name ?? this.name,
         tagline: tagline ?? this.tagline,
+        category: category ?? this.category,
         brightness: brightness ?? this.brightness,
         bg: bg ?? this.bg,
         surface: surface ?? this.surface,

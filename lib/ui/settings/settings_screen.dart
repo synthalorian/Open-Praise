@@ -17,30 +17,105 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text('THEME',
+          Text('THEMES',
               style: active.heading.copyWith(fontSize: 14, letterSpacing: 3)),
           const SizedBox(height: 4),
-          Text('Tap a card to switch looks.',
+          Text('Tap a card to switch looks. ${AppThemes.all.length} themes total.',
               style: TextStyle(color: active.muted, fontSize: 12)),
-          const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.35,
-            children: AppThemes.all
-                .map((preset) => _ThemeCard(
-                      preset: preset,
-                      isActive: preset.id == active.id,
-                      onTap: () =>
-                          ref.read(themeProvider.notifier).setTheme(preset.id),
-                    ))
-                .toList(),
-          ),
+          const SizedBox(height: 8),
+          // Category sections
+          ...AppThemes.grouped.asMap().entries.map((entry) {
+            final i = entry.key;
+            final group = entry.value;
+            if (group.isEmpty) return const SizedBox.shrink();
+            return _CategorySection(
+              category: AppThemes.categories[i],
+              presets: group,
+              activeId: active.id,
+              onThemeTap: (id) =>
+                  ref.read(themeProvider.notifier).setTheme(id),
+            );
+          }),
         ],
       ),
+    );
+  }
+}
+
+class _CategorySection extends StatelessWidget {
+  final String category;
+  final List<AppTheme> presets;
+  final String activeId;
+  final void Function(String id) onThemeTap;
+
+  const _CategorySection({
+    required this.category,
+    required this.presets,
+    required this.activeId,
+    required this.onThemeTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = presets.firstWhere(
+      (t) => t.id == activeId,
+      orElse: () => presets.first,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 16, bottom: 10),
+          child: Row(
+            children: [
+              Container(
+                width: 3,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: accent.primary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                category.toUpperCase(),
+                style: TextStyle(
+                  color: accent.primary,
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 3,
+                  fontSize: 12,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${presets.length}',
+                style: TextStyle(
+                  color: accent.muted,
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.35,
+          children: presets
+              .map((preset) => _ThemeCard(
+                    preset: preset,
+                    isActive: preset.id == activeId,
+                    onTap: () => onThemeTap(preset.id),
+                  ))
+              .toList(),
+        ),
+      ],
     );
   }
 }

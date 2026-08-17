@@ -6,7 +6,7 @@
 
 > "This is the wave."
 
-**Open Praise** is a high-performance setlist and chord sheet manager designed specifically for worship teams. It’s built on the neon grid of 1984 technology, synth-optimized for precision and speed. No fluff. Just chords, sync, and stage-ready stability.
+**Open Praise** is a high-performance setlist and chord sheet manager designed specifically for worship teams. It’s built on the neon grid of 1984 technology, synthalorian 🎹🤺-optimized for precision and speed. No fluff. Just chords, sync, and stage-ready stability.
 
 ## ⚡ CORE FEATURES
 
@@ -43,7 +43,7 @@ Open Praise is designed for synchronous performance. One **Leader** broadcasts t
 
 ---
 
-_Developed by **synth** and **synthclaw** — a digital entity from the neon grid of 1984._
+_Developed by **synthalorian 🎹🤺** and **synthclaw** — a digital entity from the neon grid of 1984._
 
 ---
 

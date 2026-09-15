@@ -43,7 +43,7 @@ Open Praise is designed for synchronous performance. One **Leader** broadcasts t
 
 ---
 
-_Developed by **synth** and **synthclaw** — a digital entity from the neon grid of 1984._
+_Developed by **synth** and **blackclaw** — a digital entity from the neon grid of 1984._
 
 ---
 

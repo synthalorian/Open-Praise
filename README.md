@@ -1,3 +1,5 @@
+![Open-Praise](.github/preview.png)
+
 # 🎹 OPEN PRAISE // S6.5
 
 ![Status](https://img.shields.io/badge/SIGNAL-ACTIVE-brightgreen?style=for-the-badge)

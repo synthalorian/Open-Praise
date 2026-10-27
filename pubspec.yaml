@@ -15,7 +15,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   web_socket_channel: ^3.0.3
-  network_info_plus: ^5.0.1
+  network_info_plus: ^7.0.0
   flutter_midi_command: ^0.5.1
   file_picker: ^8.0.0
   supabase_flutter: ^2.12.2

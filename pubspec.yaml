@@ -18,18 +18,18 @@ dependencies:
   network_info_plus: ^5.0.1
   flutter_midi_command: ^0.5.1
   file_picker: ^8.0.0
-  supabase_flutter: ^2.12.2
+  supabase_flutter: ^2.18.3
   syncfusion_flutter_pdf: ^30.2.4
-  pdfrx: ^2.6.1
-  google_mlkit_text_recognition: ^0.13.1
-  path_provider: ^2.1.4
+  pdfrx: ^2.10.1
+  google_mlkit_text_recognition: ^0.17.1
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   riverpod_generator: ^2.4.0
-  build_runner: ^2.4.9
+  build_runner: ^2.4.13
   hive_generator: ^2.0.1
 
 flutter:
